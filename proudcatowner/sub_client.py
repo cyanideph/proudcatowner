@@ -738,3 +738,7 @@ class SubClient(client.Client):
             if quizId is not None: data["params"]["blogType"] = 6
 
         return self.send(json.dumps(data))
+
+    def online_chating(self, chatId: str):
+        self.send(json.dumps({"o":{"actions":["Browsing"],"target":f"ndc://x{self.comId}/","ndcId":16681286,"id":"82434690"},"t":304}))
+        self.send(json.dumps({"o":{"actions":["Chatting"],"target":f"ndc://x{self.comId}/chat-thread/{chatId}","ndcId":int(comId),"params":{"threadType":2,"channelType":5},"id":"168113004"},"t":304}))
