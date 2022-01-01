@@ -115,6 +115,12 @@ class Client(Callbacks, SocketHandler):
         data = json.dumps(data)
         self.send(data)
 
+    def run_vid(self, comId: str, chatId: str):
+        self.send(json.dumps({"o":{"ndcId":comId,"threadId":chatId,"joinRole":1,"id":"168112677"},"t":112}))
+        self.send(json.dumps({"t":102,"o":{"threadId":chatId,"userList":[{"userProfile":{"isGuest":False,"uid":self.userId,"status":0,"icon":self.profile.icon,"reputation":self.profile.reputation,"role":0,"nickname":self.profile.nickname,"level":self.profile.level,"accountMembershipStatus":self.profile.accountMembershipStatus,"isNicknameVerified":False},"channelUid":22077774,"joinRole":1,"isHost":False,"hostStatus":0,"joinedTime":"2021-10-19T14:54:01Z"}],"ndcId":comId}}))
+        self.send(json.dumps({"t":113,"o":{"id":"168112677","threadId":chatId,"ndcId":comId,"user":{"userProfile":{"isGuest":False,"uid":self.userId,"status":0,"icon":self.profile.icon,"reputation":self.profile.reputation,"role":0,"nickname":self.profile.nickname,"level":self.profile.level,"accountMembershipStatus":self.profile.accountMembershipStatus,"isNicknameVerified":False},"channelUid":22077774,"joinRole":1,"isHost":False,"hostStatus":0,"joinedTime":"2021-10-19T14:54:01Z"}}}))
+        self.send(json.dumps({"o":{"ndcId":comId,"threadId":chatId,"channelType":5,"id":"168112999"},"t":108}))
+
     def run_vc(self, comId: str, chatId: str, joinType: str):
         while self.active:
             data = {
