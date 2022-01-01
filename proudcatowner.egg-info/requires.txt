@@ -1,0 +1,15 @@
+requests
+torpy
+lxml
+secmail
+colored
+bs4
+names
+fancy_text
+colorama
+typing
+websocket-client==0.58.0
+setuptools
+json_minify
+six
+websockets

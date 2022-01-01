@@ -1,0 +1,13 @@
+Metadata-Version: 1.2
+Name: proudcatowner
+Version: 1.0.4
+Summary: ''
+Home-page: https://github.com/forevercynical/proudcatowner
+Author: Cynical
+Author-email: 
+License: MIT
+Description: `pip install proudcatowner`
+        
+Keywords: aminoapps
+Platform: Multiple
+Requires-Python: >=3.6
