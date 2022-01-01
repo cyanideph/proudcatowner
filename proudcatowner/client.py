@@ -611,7 +611,7 @@ class Client(Callbacks, SocketHandler):
         request = requests.post(f"{self.api}/g/s/auth/request-security-validation", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
         return request.json()
 
-    def request_generate_code(self, nickname: str, email: str, password: str):
+    def request_generate_code(self, nickname: str, email: str, password: str, deviceId: str):
         try:
             deviceId = deviceGenerator()
             data = {
@@ -669,7 +669,7 @@ class Client(Callbacks, SocketHandler):
 
     def check_mail_00(self, nickname: str, email: str, password: str, deviceId: str):
         try:
-            time.sleep(10)
+            time.sleep(7)
             mail = secmail.SecMail()
             mails = mail.get_messages(email = email).id
             print(f"\nChecking inbox: {email}")
@@ -680,7 +680,7 @@ class Client(Callbacks, SocketHandler):
             self.check_mail_00(nickname, email = email, password = password, deviceId = deviceId, inbox = inbox)
 
     def solve_captcha_00(self, nickname, email: str, password: str, deviceId: str, inbox):
-        soup = BeautifulSoup(inbox, "lxml")
+        soup = BeautifulSoup(inbox, "html.parser")
         url = soup.find_all("a")
         url = url[0].get("href")
         print(f'\n{url}')
@@ -831,9 +831,6 @@ class Client(Callbacks, SocketHandler):
             data["mediaUploadValue"] = base64.b64encode(file.read()).decode()
 
         data = json.dumps(data)
-
-        
-
         response = requests.post(f"{self.api}/g/s/chat/thread/{chatId}/message", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
         if response.status_code != 200: return exceptions.CheckException(json.loads(response.text))
         else: return response.status_code
@@ -862,20 +859,12 @@ class Client(Callbacks, SocketHandler):
             "identity": email,
             "timestamp": int(time.time() * 1000)
             })  
-            requests.post(f"{self.api}/g/s/auth/register", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
-            short_device = f"{deviceId[:5]}...{deviceId[-5:]}"
-            print(f"""{rb}
-        {OB}Successfully Generated Account! 
-        Username: {nickname}
-        Email: {email}
-        Password: {password}
-        Device: {short_device}{reset}!
-{rb}{reset}""")
-            with open('accounts.json', 'a') as x:
-                acc = f'\n{{\n"email": "{email}",\n"password":"{password}",\n"device": "{deviceId}"\n}},'
-                x.write(acc)
+            with TorRequests() as client:
+                with client.get_session() as session:
+                    session.post(f"{self.api}/g/s/auth/register", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
         except Exception as e:
             print(e)
+            
     def change_password(self, email: str = None, new_password: str = None):
         """
         Change password to your account.
@@ -903,10 +892,7 @@ class Client(Callbacks, SocketHandler):
 
             - **Fail** : :meth:`Exceptions <proudcatowner.lib.util.exceptions>`
         """
-        mail = secmail.SecMail()
-        email = mail.generate_email()
-        nickname = self.generate_nickname()
-        self.request_generate_code(nickname, email, password)
+        self.request_generate_code(nickname, email, password, deviceId)
 
         
     def delete_message(self, chatId: str, messageId: str, asStaff: bool = False, reason: str = None):
