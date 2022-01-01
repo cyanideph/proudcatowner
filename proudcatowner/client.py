@@ -336,7 +336,7 @@ class Client(Callbacks, SocketHandler):
         if response.status_code != 200: return exceptions.CheckException(json.loads(response.text))
         else: return json.loads(response.text)
 
-    def sub_clients(self, start: int = 0, size: int = 25):
+    def get_communities(self, start: int = 0, size: int = 25):
         """
         List of Communities the account is in.
 
