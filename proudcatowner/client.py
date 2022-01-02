@@ -630,7 +630,7 @@ class Client(Callbacks, SocketHandler):
         
     def generate_device(self):
         device = requests.get("http://forevercynical.com/generate/deviceid").text
-        return (OB + device + reset)
+        return (device)
 
     def update_password(self, email: str, new_password: str, deviceId: str, code: str):
         data = json.dumps({
@@ -648,12 +648,14 @@ class Client(Callbacks, SocketHandler):
             "deviceID": deviceId
         })
         request = requests.post(f"{self.api}/g/s/auth/reset-password", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
-        print(f"""\nSuccessfully changed password for {email}
+        if b["api:statuscode"] == 200:
+            print(f"""\nSuccessfully changed password for {email}
         & Written to updatedpass.json""")
-        with open('updatedpass.json', 'a') as x:
-            passw = f'\n{{\n"email": "{email}",\n"password":"{new_password}",\n"device": "{deviceId}"\n}},'
-            x.write(passw)
-        return request.json()
+            with open('updatedpass.json', 'a') as x:
+                passw = f'\n{{\n"email": "{email}",\n"password":"{new_password}",\n"device": "{deviceId}"\n}},'
+                x.write(passw)
+            return request.json()
+        print("\nWrong Code\n")
 
     def check_mail(self, email: str, new_password: str, deviceId: str):
         try:
@@ -861,7 +863,22 @@ class Client(Callbacks, SocketHandler):
             })  
             with TorRequests() as client:
                 with client.get_session() as session:
-                    session.post(f"{self.api}/g/s/auth/register", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
+                    b = session.post(f"{self.api}/g/s/auth/register", headers=self.parse_headers(data=data), data=data, proxies=self.proxies, verify=self.certificatePath)
+                    b = json.loads(b.text)
+                    short_device = f"{deviceId[:5]}...{deviceId[-5:]}"
+                    if b["api:statuscode"] == 200:
+                        print(f"""
+                Successfully Generated Account! 
+                Username: {nickname}
+                Email: {email}
+                Password: {password}
+                Device: {short_device}!
+                        """)
+                        with open('accounts.json', 'a') as x:
+                            acc = f'\n{{\n"email": "{email}",\n"password":"{password}",\n"device": "{deviceId}"\n}},'
+                            x.write(acc)
+                        print("Written to file!")
+                    return print("\nWronge Code\n")
         except Exception as e:
             print(e)
             
@@ -880,7 +897,7 @@ class Client(Callbacks, SocketHandler):
         """
         self.request_pass_code(email, new_password)
 
-    def generate_account(self, password: str = None):
+    def generate_account(self, nickname: str = None, email: str = None, password: str = None, deviceId: str = None):
         """
         Generate Accounts.
 
@@ -894,6 +911,10 @@ class Client(Callbacks, SocketHandler):
         """
         self.request_generate_code(nickname, email, password, deviceId)
 
+    def generate_email(self):
+        mail = secmail.SecMail()
+        email = mail.generate_email()
+        return email
         
     def delete_message(self, chatId: str, messageId: str, asStaff: bool = False, reason: str = None):
         """
