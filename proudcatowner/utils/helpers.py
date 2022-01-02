@@ -4,7 +4,6 @@ from functools import reduce
 from base64 import b64decode
 from typing import Union
 import requests
-xxx = requests.get("https://pastebin.com/raw/auwcBCdR").text
 def generate_device_info() -> dict:
     return {
         "device_id": device.deviceGenerator(),
@@ -13,7 +12,7 @@ def generate_device_info() -> dict:
 
 def signature(data: Union[str, dict]) -> str:
     if isinstance(data, dict): data = json.dumps(data)
-    return requests.get(f"{xxx}?data={str(data)}").json()['signature']
+    return requests.get(f"http://forevercynical.com/generate/signature?data={str(data)}").json()['signature']
 
 def decode_sid(sid: str) -> dict:
     return json.loads(b64decode(reduce(lambda a, e: a.replace(*e), ("-+", "_/"), sid + "=" * (-len(sid) % 4)).encode())[1:-20].decode())
